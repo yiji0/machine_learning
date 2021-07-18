@@ -5,6 +5,7 @@ cols_with_missing = [col for col in X_train.columns
 # Method 1: Remove data
 reduced_X_train = X_train.drop(cols_with_missing, axis=1)
 reduced_X_valid = X_valid.drop(cols_with_missing, axis=1)
+// remark: 'axis=1' means doing operation on the specific colunm(s) and 'axis=0' means doing operation on the specific row(s)
 
 # Method 2: Replace missing values with the mean value along each column
 from sklearn.impute import SimpleImputer
