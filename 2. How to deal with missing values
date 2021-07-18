@@ -16,7 +16,7 @@ imputed_X_valid = pd.DataFrame(my_imputer.transform(X_valid))
 imputed_X_train.columns = X_train.columns
 imputed_X_valid.columns = X_valid.columns
 
-# Method 3
+# Method 3: Impute the missing values and add colunms to show which values are imputed
 X_train_plus = X_train.copy()
 X_valid_plus = X_valid.copy()
 
