@@ -1,0 +1,45 @@
+Pre: Get list of categorical variables
+s = (X_train.dtypes == 'object')
+object_cols = list(s[s].index)
+
+# method 1: drop categorical variables
+drop_X_train = X_train.select_dtypes(exclude=['object'])
+drop_X_valid = X_valid.select_dtypes(exclude=['object'])
+
+# method 2: ordinal encoding
+from sklearn.preprocessing import OrdinalEncoder
+
+label_X_train = X_train.copy()
+label_X_valid = X_valid.copy()
+
+ordinal_encoder = OrdinalEncoder()
+label_X_train[object_cols] = ordinal_encoder.fit_transform(X_train[object_cols])
+label_X_valid[object_cols] = ordinal_encoder.transform(X_valid[object_cols])
+
+# method 3: one_hot encoding
+from sklearn.preprocessing import OneHotEncoder
+
+OH_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False)
+OH_cols_train = pd.DataFrame(OH_encoder.fit_transform(X_train[object_cols]))
+OH_cols_valid = pd.DataFrame(OH_encoder.transform(X_valid[object_cols]))
+
+OH_cols_train.index = X_train.index
+OH_cols_valid.index = X_valid.index
+
+num_X_train = X_train.drop(object_cols, axis=1)
+num_X_valid = X_valid.drop(object_cols, axis=1)
+
+OH_X_train = pd.concat([num_X_train, OH_cols_train], axis=1)
+OH_X_valid = pd.concat([num_X_valid, OH_cols_valid], axis=1)
+  
+! If the columns in X_val is not conformity with those in X_train, we can use the following approach to handle such problem.
+object_cols = [col for col in X_train.columns if X_train[col].dtype == "object"]
+good_label_cols = [col for col in object_cols if set(X_valid[col]).issubset(set(X_train[col]))]
+bad_label_cols = list(set(object_cols)-set(good_label_cols))
+  
+label_X_train = X_train.drop(bad_label_cols, axis=1)
+label_X_valid = X_valid.drop(bad_label_cols, axis=1)
+
+ordinal_encoder = OrdinalEncoder()
+label_X_train[good_label_cols] = ordinal_encoder.fit_transform(X_train[good_label_cols])
+label_X_valid[good_label_cols] = ordinal_encoder.transform(X_valid[good_label_cols])
